@@ -1,0 +1,26 @@
+library('tm')
+library(tidyverse)
+library(tidytext)
+library(stringr)
+data('stop_words')
+
+GOT <-read.csv("GOT_Words.csv", header=TRUE)
+GOT <-data.frame(GOT)
+
+GOT$Lines <- sapply(GOT$Lines, tolower)
+GOT$Lines <- removePunctuation(GOT$Lines)
+
+GOT_clean <- GOT %>%
+  anti_join(stop_words, by= c("Lines" = "word"))
+
+head(GOT_clean, n=5)
+nrow(GOT_clean)
+
+GOT_Final <- subset(GOT_clean, POV.Character=='Cersei' | POV.Character=='Jon' | POV.Character=='Daenerys')
+GOT_Final <- GOT_Final[!(is.na(GOT_Final$Lines) | GOT_Final$Lines==""), ]
+nrow(GOT_Final)
+
+GOT_unique <- data.frame(unique(GOT_Final$Lines))
+
+write.csv(GOT_unique, "/Users/adam.mccann/Documents/Confidential/GOT/GOT_Unique.csv")
+write.csv(GOT_Final, "/Users/adam.mccann/Documents/Confidential/GOT/GOT_Final.csv")
